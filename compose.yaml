@@ -1,0 +1,60 @@
+services:
+  backend:
+    build: ./splitkaro_backend
+    container_name: backend
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./splitkaro_backend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run start:dev
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./splitkaro_frontend
+    container_name: frontend
+    ports: 
+      - '3000:3000' 
+    volumes:
+      - ./splitkaro_frontend:/app
+      - /app/node_modules
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=ashu01 
+      - POSTGRES_PASSWORD=zenashu1520@
+      - POSTGRES_DB=splitkaro_db
+    ports:
+      - "5440:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ashu1520@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: zenashu1520@
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  db_data:
+
+
+
+
+
+
+
+
+
+
+
