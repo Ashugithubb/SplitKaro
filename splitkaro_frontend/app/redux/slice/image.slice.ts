@@ -1,14 +1,11 @@
 
 import { createSlice } from '@reduxjs/toolkit';
-import { uploadImage } from '../async/uploadImage';
-
-
+import { uploadImage } from '../async/upload.profile.Image.api';
 const initialState = {
   avatarUrl: '',
   uploadStatus: 'idle', 
   error: '',
 };
-
 const apiSlice = createSlice({
   name: 'api',
   initialState,

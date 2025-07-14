@@ -4,27 +4,24 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn
 
 @Entity()
 export class Settlement {
-    @PrimaryGeneratedColumn()
-    id:number
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    expense:number
+  @Column()
+  expense:number
 
-    @Column()
-    paid:number
+  @Column()
+  paid: number;
 
-    @Column()
-    pending:number
+  @Column()
+  pending: number;
 
-    @Column()
-    paymentDate:Date
+  @Column()
+  paymentDate: Date;
 
-    @ManyToOne(()=>Expense,(e)=>e.settlement)
-    expen:Expense
+  @ManyToOne(() => Expense, (e) => e.settlement, { onDelete: 'CASCADE' })
+  expen: Expense;
 
-    @OneToOne(()=>User)
-    @JoinColumn()
-    user:User
-
-
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  user: User;
 }

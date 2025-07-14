@@ -18,8 +18,9 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation'
-// import { useAppDispatch } from '../redux/store/store';
-// import { setUser } from '../redux/slice/user';
+import { useAppDispatch } from '../redux/store/store';
+import { setUser } from '../redux/slice/auth.slice';
+
 // import { useAppSelector } from '../redux/hook/hook';
 
 const loginSchema = z.object({
@@ -31,7 +32,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-//   const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const {
     register,
@@ -48,15 +49,14 @@ const notify = () => toast("Login Successfull!");
       const res = await axios.post('http://localhost:3001/auth/login', data, {
         withCredentials: true, 
       });
-    //   const res2 = await axios.post('http://localhost:3333/user/email', {email} );
-    //    dispatch(setUser({ email: data.email, isVerified: res2.data }));
       console.log(res.data);
       notify()
+      dispatch(setUser({email}));
       router.push('/home');
+     
     }
     catch (err) {
-      console.log(err);
-    //   dispatch(setUser({ email: data.email, isVerified: false }));
+       toast.error("Login failed: " + (err as Error).message);
     }
 
   };
@@ -73,6 +73,7 @@ const notify = () => toast("Login Successfull!");
       minHeight="100vh"
       bgcolor="#f5f5f5"
     >
+        <ToastContainer />
       <Paper elevation={3} sx={{ padding: 4, width: 350 }}>
         <Typography variant="h5" gutterBottom>
           Login

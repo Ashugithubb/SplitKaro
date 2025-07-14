@@ -7,7 +7,7 @@ import { Group } from 'src/groups/entities/group.entity';
 import { GroupMember } from 'src/group_members/entities/group_member.entity';
 import { Expense } from 'src/expense/entities/expense.entity';
 import { Settlement } from 'src/settlements/entities/settlement.entity';
-import { Category } from 'src/expense/entities/category.entity';
+
 
 
 export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
@@ -20,7 +20,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
     username: configService.get<string>('DB_USERNAME'),
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_DATABASE'),
-    entities:[Auth,User,Group,GroupMember,Expense,Settlement,Category],
+    entities:[Auth,User,Group,GroupMember,Expense,Settlement],
     synchronize: true,
     // migrations: ['dist/migrations/**/*.js'],
   }),

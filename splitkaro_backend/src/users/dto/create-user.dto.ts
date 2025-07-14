@@ -1,10 +1,5 @@
 import { IsEmail, IsEnum, IsInt, IsOptional, IsPhoneNumber, IsString, IsUrl } from "class-validator";
-
-export enum UserGender {
-      MALE = 'male',
-      FEMALE = 'female',
-      OTHER = 'other',
-    } 
+import { Gender } from "../entities/user.entity";
 
 export class CreateUserDto {
     @IsString()
@@ -12,12 +7,10 @@ export class CreateUserDto {
 
     @IsString()
     last_name:string
-
-    @IsEmail()
+    @IsString()
     email:string
-
-    @IsEnum(UserGender, { message: 'Invalid user gender' })
-    gender : UserGender
+    @IsEnum(Gender, { message: 'Invalid user gender' })
+    gender : Gender
 
     @IsInt()
     age:number
@@ -25,7 +18,7 @@ export class CreateUserDto {
     @IsPhoneNumber()
     mob:string
 
-    @IsUrl()
+    @IsString()
     @IsOptional()
     avatar:string
 

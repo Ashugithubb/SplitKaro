@@ -1,18 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth';
 
-@Controller('groups')
+@Controller('group')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
-  }
+  @Post('create')
+@UseGuards(JwtAuthGuard)
+createGroup(@Body() dto: CreateGroupDto, @Req() req) {
+  return this.groupsService.createGroup(dto, req.user);
+}
 
-  @Get()
+
+
+@UseGuards(JwtAuthGuard)
+@Get('my-groups')
+async getGroupsWhereUserIsMember(@Req() req) {
+  const userId = req.user.id;
+  return this.groupsService.getGroupsOfMember(userId);
+}
+
+@Get()
   findAll() {
     return this.groupsService.findAll();
   }
@@ -20,6 +32,10 @@ export class GroupsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.groupsService.findOne(+id);
+  }
+  @Get('expenses/:id')
+   findAllExpense(@Param('id') id: string){
+    return this.groupsService.findAllExpense(+id)
   }
 
   @Patch(':id')

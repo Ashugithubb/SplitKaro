@@ -1,28 +1,34 @@
 import { Group } from "src/groups/entities/group.entity";
 import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Category } from "./category.entity";
 import { Settlement } from "src/settlements/entities/settlement.entity";
+import { Category } from "./enum/categories";
+
+
 
 @Entity()
 export class Expense {
-    @PrimaryGeneratedColumn()
-    id:number
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    description:string
+  @Column()
+  description: string;
 
-    @Column()
-    amount:number
+  @Column()
+  amount: number;
 
-    @CreateDateColumn()
-    createdAt:Date
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @ManyToOne(()=>Group,(group)=>group.expenses)
-    group:Group
-    
-    @OneToOne(()=>Category,(category)=>category.expense)
-    category:Category
+  @ManyToOne(() => Group, (group) => group.expenses)
+  group: Group;
 
-    @OneToMany(()=>Settlement,(s)=>s.expen)
-    settlement: Settlement[]
+  @Column({
+    type: 'enum',
+    enum: Category,
+    default: Category.OTHER,  
+  })
+  category: Category;
+
+  @OneToMany(() => Settlement, (s) => s.expen)
+  settlement: Settlement[];
 }

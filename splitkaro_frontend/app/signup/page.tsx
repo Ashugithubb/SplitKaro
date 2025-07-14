@@ -46,21 +46,15 @@ const router = useRouter();
       confirmPassword: '',
     },
   });
-
   const onSubmit = async (data: SignupFormData) => {
     try{
-      
-   
     const res = await axios.post('http://localhost:3001/auth/signup',data);
     console.log(res);
     router.push('/login');
-    
   }
     catch(error){
         console.log(error);
     }
-
-   
   };
 
   return (

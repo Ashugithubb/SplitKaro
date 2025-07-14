@@ -18,7 +18,8 @@ import { UsersModule } from 'src/users/users.module';
   imports: [TypeOrmModule.forFeature([Auth]),UsersModule,HasingModule,ConfigModule,JwtModule.registerAsync({
     useFactory: async (configService: ConfigService) => ({
       secret: configService.get<string>('JWT_SECRET'),
-      signOptions: { expiresIn: '60s' },
+     signOptions: { expiresIn: '10m' }
+
     }),
     inject: [ConfigService],
     global: true,

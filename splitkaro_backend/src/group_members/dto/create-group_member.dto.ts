@@ -1,1 +1,4 @@
-export class CreateGroupMemberDto {}
+export class CreateGroupMemberDto {
+  groupId: number;
+  userId: number;
+}

@@ -1,5 +1,5 @@
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('auth_user')
 export class Auth {
@@ -19,5 +19,6 @@ export class Auth {
     createdAt:Date
 
     @OneToOne(()=>User)
+    @JoinColumn()
     user:User
 }

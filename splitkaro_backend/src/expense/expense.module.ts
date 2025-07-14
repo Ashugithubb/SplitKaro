@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { ExpenseController } from './expense.controller';
-import { Category } from './entities/category.entity';
+
 import { Expense } from './entities/expense.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Group } from 'src/groups/entities/group.entity';
+import { Settlement } from 'src/settlements/entities/settlement.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Category,Expense])],
+  imports:[TypeOrmModule.forFeature([Expense,Group,Settlement])],
   controllers: [ExpenseController],
   providers: [ExpenseService],
 })

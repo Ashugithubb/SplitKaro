@@ -1,39 +1,60 @@
-import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import Avatar from '@mui/material/Avatar';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Box from '@mui/material/Box';
-import Image from 'next/image'; // If using Next.js
+// app/home/page.tsx or wherever your HomePage is
+'use client';
 
-const Navbar: React.FC = () => {
-  return (
-    <AppBar position="static" color="secondary">
-      <Toolbar>
-        {/* Logo + AppName */}
-        <Box display="flex" alignItems="center" gap={1}>
-          {/* Replace with your own logo path */}
-          <Image src="https://framerusercontent.com/images/VUqdevjirDo8kn502U0VpXsVw.svg?scale-down-to=2048" alt="Logo" width={32} height={32} />
-          <Typography variant="h6" noWrap>
-            SplitKaro
-          </Typography>
-        </Box>
+import { Box, Button } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { useState } from 'react';
+import Navbar from '../component/navbar';
+import GroupDialog from '../component/GroupDialog';
+import axios from 'axios';
+import GroupList from '../component/GroupList';
 
-        {/* Spacer */}
-        <Box flexGrow={1} />
 
-        {/* Notification Bell + Avatar */}
-        <Box display="flex" alignItems="center" gap={2}>
-          <IconButton color="inherit">
-            <NotificationsIcon />
-          </IconButton>
-          <Avatar alt="Ashu" src="/profile.jpg" />
-        </Box>
-      </Toolbar>
-    </AppBar>
+export default function HomePage() {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleCreateGroup = async (groupData: { group_name: string; createdBy: string }) => {
+    console.log("New Group Created:", groupData);
+    try {
+  const res = await axios.post(
+    "http://localhost:3001/group/create",
+    groupData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true, 
+    }
   );
-};
+  console.log(res.data); // log actual response data
+} catch (err) {
+  console.error('Error creating group:', err);
+}
 
-export default Navbar;
+  };
+
+  return (
+    <>
+      <Navbar />
+
+      <Button
+        sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}
+        onClick={() => setOpenDialog(true)}
+        variant="outlined"
+        startIcon={<AddIcon />}
+      >
+        Create a Group
+      </Button>
+<Box
+ sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mr: 3 }}>
+  <GroupList />
+</Box>
+
+      <GroupDialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onCreate={handleCreateGroup}
+      />
+    </>
+  );
+}

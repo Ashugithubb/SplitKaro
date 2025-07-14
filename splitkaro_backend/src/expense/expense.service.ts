@@ -1,12 +1,97 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Expense } from './entities/expense.entity';
+import { Repository } from 'typeorm';
+import { Group } from 'src/groups/entities/group.entity';
+import { GroupMember } from 'src/group_members/entities/group_member.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Settlement } from 'src/settlements/entities/settlement.entity';
 
 @Injectable()
 export class ExpenseService {
-  create(createExpenseDto: CreateExpenseDto) {
-    return 'This action adds a new expense';
-  }
+  constructor(
+    @InjectRepository(Expense)
+    private expenseRepo: Repository<Expense>,
+
+    @InjectRepository(Group)
+    private groupRepo: Repository<Group>,
+    @InjectRepository(Settlement) private readonly settlementRepo:Repository<Settlement>
+  ) { }
+
+  // async create(createExpenseDto: CreateExpenseDto, userId: number): Promise<Expense> {
+  //   const { description, amount, category, groupId } = createExpenseDto;
+
+  //   const group = await this.groupRepo.findOne({
+  //     where: { id: groupId },
+  //   });
+
+  //   if (!group) {
+  //     throw new NotFoundException('Group not found');
+  //   }
+
+  //   const newExpense = this.expenseRepo.create({
+  //     description,
+  //     amount,
+  //     category,
+  //     group,
+  //   });
+
+
+  //   return await this.expenseRepo.save(newExpense);
+  // }
+
+
+async createExpense(dto: CreateExpenseDto, user: User) {
+  const group = await this.groupRepo.findOne({
+    where: { id: dto.groupId },
+    relations: ['group_member', 'group_member.user'],
+  });
+
+  if (!group) throw new NotFoundException('Group not found');
+
+  const expense = this.expenseRepo.create({
+    description: dto.description,
+    amount: dto.amount,
+    group: group,
+    category: dto.category,
+  });
+
+  await this.expenseRepo.save(expense);
+
+  // ✅ Fix: Define members
+  const members = group.group_member;
+  const numMembers = members.length;
+  const splitAmount = Math.floor(dto.amount / numMembers);
+  const Total = dto.amount;
+  const balance =Total-splitAmount
+
+  const settlements = members.map((member) =>
+    this.settlementRepo.create({
+      expen: expense,
+      user: member.user,
+      expense: splitAmount, 
+      paid: member.user.id === user.id ? Total : 0,
+      pending: member.user.id === user.id ? balance : (0-splitAmount),
+      paymentDate: new Date(),
+    }),
+  );
+
+  await this.settlementRepo.save(settlements);
+
+  return { message: 'Expense and settlements added', expense, settlements };
+}
+
+
+
+   async getSettlementsDetails(expensId:number){
+      const expend = await this.expenseRepo.findOne({
+        where: { id: expensId },
+       relations: ['settlement', 'settlement.user']
+      })
+    return  expend;
+   }
 
   findAll() {
     return `This action returns all expense`;
@@ -20,7 +105,7 @@ export class ExpenseService {
     return `This action updates a #${id} expense`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} expense`;
+  async remove(id: number) {
+    return await this.expenseRepo.delete({id});
   }
 }

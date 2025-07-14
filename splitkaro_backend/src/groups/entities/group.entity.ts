@@ -9,8 +9,8 @@ export class Group {
     id:number
 
     @Column()
-    createdBy:string 
-
+    group_name:string
+    
     @Column({default:0})
     number_of_members:number
 
