@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
@@ -46,5 +46,16 @@ async getGroupsWhereUserIsMember(@Req() req) {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Get('balance/:groupId')
+  async getUserGroupBalance(
+    @Param('groupId', ParseIntPipe) groupId: number,
+    @Req() req
+  ) {
+    const userId = req.user.id; 
+    return this.groupsService.userGroupBlance(groupId, userId);
   }
 }

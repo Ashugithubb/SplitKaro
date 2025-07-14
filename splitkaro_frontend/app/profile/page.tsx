@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { userSchema } from "./schema/profile.schema"
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Avatar, Box, Button, FormControlLabel, FormLabel, Paper, Radio, RadioGroup, TextField, Typography } from "@mui/material";
 import { ToastContainer, toast } from 'react-toastify';
@@ -26,6 +26,7 @@ export default function Profile() {
         handleSubmit,
         control,
         formState: { errors },
+        reset,
     } = useForm<ProfileData>({
         resolver: zodResolver(userSchema),
     });
@@ -33,6 +34,38 @@ export default function Profile() {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [cloudUrl, setCloudUrl] = useState<string>("");
+
+    const [userDate,setUserData] = useState({});
+
+    useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/user/info', {
+        withCredentials: true,
+      });
+
+      const data = res.data;
+
+      // Set avatar preview
+      setAvatarPreview(data.avatar);
+
+      // ✅ Set form values using react-hook-form reset()
+      reset({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        gender: data.gender,
+        age: data.age,
+        mob: data.mob,
+        bio: data.bio,
+      });
+    } catch (err) {
+      console.error("Failed to load profile", err);
+    }
+  };
+
+  fetchProfile();
+}, [reset]);
+
 
     const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

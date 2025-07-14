@@ -9,6 +9,7 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  TextField,
 } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
@@ -45,6 +46,9 @@ export default function Events() {
   const params = useParams();
   const expensId = parseInt(params.expensId as string, 10);
   const [data, setSettlement] = useState<ExpenseData | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editedExpense, setEditedExpense] = useState<number>(0);
+  const [editedPaid, setEditedPaid] = useState<number>(0);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -54,7 +58,6 @@ export default function Events() {
           { withCredentials: true }
         );
         setSettlement(res.data);
-        console.log(res.data);
       } catch (err) {
         console.error('Failed to fetch expenses:', err);
       }
@@ -64,6 +67,33 @@ export default function Events() {
       fetchExpenses();
     }
   }, [expensId]);
+
+  const handleEdit = (s: SettlementItem) => {
+    setEditId(s.id);
+    setEditedExpense(s.expense);
+    setEditedPaid(s.paid);
+  };
+
+  const handleSave = async (settlementId: number) => {
+    try {
+      await axios.put(
+        `http://localhost:3001/settlements/update/${settlementId}`,
+        {
+          expense: editedExpense,
+        },
+        { withCredentials: true }
+      );
+      // Refetch updated data
+      const res = await axios.get(
+        `http://localhost:3001/expense/settlement/${expensId}`,
+        { withCredentials: true }
+      );
+      setSettlement(res.data);
+      setEditId(null);
+    } catch (error) {
+      console.error('Failed to update settlement:', error);
+    }
+  };
 
   if (!data) return <Typography>Loading...</Typography>;
 
@@ -80,7 +110,6 @@ export default function Events() {
           boxShadow: 3,
           borderRadius: 3,
           backgroundColor: '#6e9bc7ff',
-         
         }}
       >
         <CardHeader
@@ -89,7 +118,7 @@ export default function Events() {
         />
         <CardContent>
           <Typography variant="h6" color="secondary">
-            Total Spent: ₹{data.amount} 
+            Total Spent: ₹{data.amount}
           </Typography>
         </CardContent>
       </Card>
@@ -106,10 +135,9 @@ export default function Events() {
           <Box
             key={s.id}
             display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={2}
-            mb={2}
+            flexDirection="column"
+            gap={1}
+            mb={3}
             p={2}
             sx={{
               border: '1px solid #ddd',
@@ -119,25 +147,108 @@ export default function Events() {
               boxShadow: 1,
             }}
           >
-            <Box display="flex" alignItems="center" gap={2}>
-              <Avatar src={s.user.avatar} alt={fullName} />
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {fullName}
-                </Typography>
-                <Typography variant="body2" color={color}>
-                  Pending: {pending}₹
-                </Typography>
+            {/* Main Row */}
+            <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar src={s.user.avatar} alt={fullName} />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {fullName}
+                  </Typography>
+                  <Typography variant="body2" color={color}>
+                    Pending: {pending}₹
+                  </Typography>
+                </Box>
               </Box>
+              <Button variant="outlined" size="small" color="primary" onClick={() => handleEdit(s)}>
+                Edit
+              </Button>
             </Box>
-            <Button
-              variant="outlined"
-              size="small"
-              color="primary"
-              onClick={() => alert(`Edit user ${fullName}`)}
-            >
-              Edit
-            </Button>
+
+            {/* Editable Fields */}
+            {editId === s.id && (
+              <Box display="flex" flexDirection="column" gap={1} mt={2}>
+                <TextField
+  label="Expense"
+  type="number"
+  value={editedExpense}
+  onChange={(e) => setEditedExpense(parseInt(e.target.value))}
+  fullWidth
+  size="small"
+  variant="outlined"
+  sx={{
+    backgroundColor: '#1e1e1e',
+    input: { color: 'white' },
+    label: { color: '#bbb' },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#555',
+      },
+      '&:hover fieldset': {
+        borderColor: '#888',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#1976d2',
+      },
+    },
+  }}
+/>
+
+      <Box display="flex" gap={1} alignItems="center">
+  <TextField
+    label="Paid"
+    type="number"
+    value={editedPaid}
+    onChange={(e) => {
+      const value = parseInt(e.target.value);
+      if (!isNaN(value)) {
+        if (value >= 0 && value <= data.amount) {
+          setEditedPaid(value);
+        }
+      } else {
+        setEditedPaid(0);
+      }
+    }}
+    fullWidth
+    size="small"
+    variant="outlined"
+    inputProps={{
+      min: 0,
+      max: data.amount,
+    }}
+    sx={{
+      backgroundColor: '#1e1e1e',
+      input: { color: 'white' },
+      label: { color: '#bbb' },
+      '& .MuiOutlinedInput-root': {
+        '& fieldset': {
+          borderColor: '#555',
+        },
+        '&:hover fieldset': {
+          borderColor: '#888',
+        },
+        '&.Mui-focused fieldset': {
+          borderColor: '#1976d2',
+        },
+      },
+    }}
+  />
+
+  <Button
+    variant="contained"
+    color="success"
+    size="small"
+    sx={{ height: '40px' }}
+  >
+    Pay
+  </Button>
+</Box>
+
+                <Button variant="contained" onClick={() => handleSave(s.id)}>
+                  Save
+                </Button>
+              </Box>
+            )}
           </Box>
         );
       })}

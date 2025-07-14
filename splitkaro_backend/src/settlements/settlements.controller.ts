@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
 import { SettlementsService } from './settlements.service';
 import { CreateSettlementDto } from './dto/create-settlement.dto';
 import { UpdateSettlementDto } from './dto/update-settlement.dto';
@@ -22,10 +22,14 @@ export class SettlementsController {
     return this.settlementsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSettlementDto: UpdateSettlementDto) {
-    return this.settlementsService.update(+id, updateSettlementDto);
-  }
+  @Put('update/:id')
+async updateSettlement(
+  @Param('id', ParseIntPipe) id: number,
+  @Body() dto: UpdateSettlementDto,
+) {
+  return this.settlementsService.updateSettlement(id, dto);
+}
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

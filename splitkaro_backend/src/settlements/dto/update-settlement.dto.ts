@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSettlementDto } from './create-settlement.dto';
+// dto/update-settlement.dto.ts
+import { IsNumber } from 'class-validator';
 
-export class UpdateSettlementDto extends PartialType(CreateSettlementDto) {}
+export class UpdateSettlementDto {
+  @IsNumber()
+  expense: number;
+}

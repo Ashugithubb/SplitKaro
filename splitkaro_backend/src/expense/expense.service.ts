@@ -60,7 +60,7 @@ async createExpense(dto: CreateExpenseDto, user: User) {
 
   await this.expenseRepo.save(expense);
 
-  // ✅ Fix: Define members
+ 
   const members = group.group_member;
   const numMembers = members.length;
   const splitAmount = Math.floor(dto.amount / numMembers);

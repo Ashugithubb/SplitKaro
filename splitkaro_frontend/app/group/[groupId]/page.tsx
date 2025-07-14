@@ -19,6 +19,7 @@ import Navbar from '@/app/component/navbar';
 import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
+import { any } from 'zod';
 const groupMembers = [
   { id: 1, name: 'Ashutosh' },
   { id: 2, name: 'Rahul' },
@@ -36,6 +37,16 @@ const categories = [
   'other',
 ];
 
+type Balance = {
+  totalExpense: number;
+  totalPaid: number;
+  totalPending: number;
+  count: number;
+};
+
+
+
+
 export default function GroupDetails() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,9 +59,14 @@ export default function GroupDetails() {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
-
-
-  const [expenses,setExpenses] = useState([])
+ ;
+  const [expenses,setExpenses] = useState([]);
+  const [balance, setBalance] = useState<Balance>({
+  totalExpense: 0,
+  totalPaid: 0,
+  totalPending: 0,
+  count: 0,
+});
 
   const router = useRouter();
 
@@ -165,6 +181,26 @@ const handelEventClick = (expensId:string)=>{
 }
 
 
+ useEffect(() => {
+  const fetchBalance = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3001/group/balance/${groupId}`, {
+        withCredentials: true,
+      });
+      setBalance(res.data); // ✅ full object (not just count)
+    } catch (err) {
+      console.error('Error fetching balance:', err);
+    }
+  };
+
+  if (groupId) {
+    fetchBalance();
+  }
+}, [groupId]);
+
+
+
+
   return (
     <>
       <Navbar />
@@ -195,24 +231,25 @@ const handelEventClick = (expensId:string)=>{
 
       }}
     >
-      <Typography variant="body1">Your Balance</Typography>
-      <Typography variant="h5" fontWeight="bold">$425</Typography>
+     <Typography variant="body1">Your Balance</Typography>
+<Typography variant="h5" fontWeight="bold" color={balance.totalPending < 0 ? 'error' : 'success.main'}>
+  ₹{balance.totalPending}
+</Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          
-          <Typography variant="body2">Payment</Typography>
-          <Typography fontWeight="bold">$850</Typography>
-        </Box>
+<Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Typography variant="body2">Payment</Typography>
+    <Typography fontWeight="bold">₹{balance.totalPaid}</Typography>
+  </Box>
 
-        <Box sx={{ borderLeft: '1px solid #ccc', mx: 2, height: 40 }} />
+  <Box sx={{ borderLeft: '1px solid #ccc', mx: 2, height: 40 }} />
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          
-          <Typography variant="body2">Expense</Typography>
-          <Typography fontWeight="bold">$425</Typography>
-        </Box>
-      </Box>
+  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Typography variant="body2">Expense</Typography>
+    <Typography fontWeight="bold">₹{balance.totalExpense}</Typography>
+  </Box>
+</Box>
+
     </Box>
 
     {/* Add Expenses Button - Right */}
