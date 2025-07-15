@@ -37,14 +37,12 @@ constructor(
     user,
   });
  
- 
   const saved = await this.groupMemberRepo.save(newGroupMember);
 
-  
   group.number_of_members += 1;
- 
   return saved;
 }
+
 
 
   findAll() {
@@ -59,7 +57,22 @@ constructor(
     return `This action updates a #${id} groupMember`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} groupMember`;
+  // group-members.service.ts
+
+async removeMember(groupId: number, memberId: number): Promise<void> {
+  const member = await this.groupMemberRepo.findOne({
+    where: {
+      id: memberId,
+      group: { id: groupId },
+    },
+    relations: ['group'],
+  });
+
+  if (!member) {
+    throw new NotFoundException('Member not found in this group');
   }
+
+  await this.groupMemberRepo.remove(member);
+}
+
 }

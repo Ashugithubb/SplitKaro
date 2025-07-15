@@ -10,12 +10,13 @@ import {
   CardHeader,
   Divider,
   TextField,
+  IconButton,
 } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-// ---------- Type Definitions ----------
+// import { useNavigate } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 type User = {
   id: number;
   first_name: string;
@@ -41,7 +42,7 @@ type ExpenseData = {
   settlement: SettlementItem[];
 };
 
-// ---------- Component ----------
+
 export default function Events() {
   const params = useParams();
   const expensId = parseInt(params.expensId as string, 10);
@@ -49,6 +50,7 @@ export default function Events() {
   const [editId, setEditId] = useState<number | null>(null);
   const [editedExpense, setEditedExpense] = useState<number>(0);
   const [editedPaid, setEditedPaid] = useState<number>(0);
+
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -96,6 +98,16 @@ export default function Events() {
   };
 
   if (!data) return <Typography>Loading...</Typography>;
+  const handelDeleteClick = ()=>{
+    try{
+        const res = axios.delete(`http://localhost:3001/expense/${expensId}`);
+        console.log(res);
+       window.history.back();
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
 
   return (
     <>
@@ -112,15 +124,22 @@ export default function Events() {
           backgroundColor: '#6e9bc7ff',
         }}
       >
+       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+  <IconButton onClick={handelDeleteClick} sx={{ color: 'red' }}>
+    <DeleteIcon />
+  </IconButton>
+</Box>
         <CardHeader
           title={`Expense Type: ${data.category.toUpperCase()}`}
           subheader={`Expense Description: ${data.description}`}
         />
+        
         <CardContent>
           <Typography variant="h6" color="secondary">
             Total Spent: ₹{data.amount}
           </Typography>
         </CardContent>
+       
       </Card>
 
       <Divider sx={{ my: 4 }} />
@@ -169,80 +188,80 @@ export default function Events() {
             {editId === s.id && (
               <Box display="flex" flexDirection="column" gap={1} mt={2}>
                 <TextField
-  label="Expense"
-  type="number"
-  value={editedExpense}
-  onChange={(e) => setEditedExpense(parseInt(e.target.value))}
-  fullWidth
-  size="small"
-  variant="outlined"
-  sx={{
-    backgroundColor: '#1e1e1e',
-    input: { color: 'white' },
-    label: { color: '#bbb' },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#555',
-      },
-      '&:hover fieldset': {
-        borderColor: '#888',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#1976d2',
-      },
-    },
-  }}
-/>
+                  label="Expense"
+                  type="number"
+                  value={editedExpense}
+                  onChange={(e) => setEditedExpense(parseInt(e.target.value))}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: '#1e1e1e',
+                    input: { color: 'white' },
+                    label: { color: '#bbb' },
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderColor: '#555',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#888',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#1976d2',
+                      },
+                    },
+                  }}
+                />
 
-      <Box display="flex" gap={1} alignItems="center">
-  <TextField
-    label="Paid"
-    type="number"
-    value={editedPaid}
-    onChange={(e) => {
-      const value = parseInt(e.target.value);
-      if (!isNaN(value)) {
-        if (value >= 0 && value <= data.amount) {
-          setEditedPaid(value);
-        }
-      } else {
-        setEditedPaid(0);
-      }
-    }}
-    fullWidth
-    size="small"
-    variant="outlined"
-    inputProps={{
-      min: 0,
-      max: data.amount,
-    }}
-    sx={{
-      backgroundColor: '#1e1e1e',
-      input: { color: 'white' },
-      label: { color: '#bbb' },
-      '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-          borderColor: '#555',
-        },
-        '&:hover fieldset': {
-          borderColor: '#888',
-        },
-        '&.Mui-focused fieldset': {
-          borderColor: '#1976d2',
-        },
-      },
-    }}
-  />
+                <Box display="flex" gap={1} alignItems="center">
+                  <TextField
+                    label="Paid"
+                    type="number"
+                    value={editedPaid}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value)) {
+                        if (value >= 0 && value <= data.amount) {
+                          setEditedPaid(value);
+                        }
+                      } else {
+                        setEditedPaid(0);
+                      }
+                    }}
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    inputProps={{
+                      min: 0,
+                      max: data.amount,
+                    }}
+                    sx={{
+                      backgroundColor: '#1e1e1e',
+                      input: { color: 'white' },
+                      label: { color: '#bbb' },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: '#555',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#888',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#1976d2',
+                        },
+                      },
+                    }}
+                  />
 
-  <Button
-    variant="contained"
-    color="success"
-    size="small"
-    sx={{ height: '40px' }}
-  >
-    Pay
-  </Button>
-</Box>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    size="small"
+                    sx={{ height: '40px' }}
+                  >
+                    Pay
+                  </Button>
+                </Box>
 
                 <Button variant="contained" onClick={() => handleSave(s.id)}>
                   Save

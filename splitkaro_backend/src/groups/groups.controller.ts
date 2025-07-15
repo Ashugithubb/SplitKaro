@@ -58,4 +58,12 @@ async getGroupsWhereUserIsMember(@Req() req) {
     const userId = req.user.id; 
     return this.groupsService.userGroupBlance(groupId, userId);
   }
+
+
+
+  @Get('members/:groupId')
+getMembers(@Param('groupId') groupId: number) {
+  return this.groupsService.getGroupMembers(groupId);
+}
+
 }

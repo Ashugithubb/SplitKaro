@@ -8,6 +8,7 @@ import { Group } from 'src/groups/entities/group.entity';
 import { GroupMember } from 'src/group_members/entities/group_member.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Settlement } from 'src/settlements/entities/settlement.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class ExpenseService {
@@ -17,7 +18,8 @@ export class ExpenseService {
 
     @InjectRepository(Group)
     private groupRepo: Repository<Group>,
-    @InjectRepository(Settlement) private readonly settlementRepo:Repository<Settlement>
+    @InjectRepository(Settlement) private readonly settlementRepo:Repository<Settlement>,
+    private readonly mailService: MailService
   ) { }
 
   // async create(createExpenseDto: CreateExpenseDto, userId: number): Promise<Expense> {
@@ -43,6 +45,45 @@ export class ExpenseService {
   // }
 
 
+// async createExpense(dto: CreateExpenseDto, user: User) {
+//   const group = await this.groupRepo.findOne({
+//     where: { id: dto.groupId },
+//     relations: ['group_member', 'group_member.user'],
+//   });
+
+//   if (!group) throw new NotFoundException('Group not found');
+
+//   const expense = this.expenseRepo.create({
+//     description: dto.description,
+//     amount: dto.amount,
+//     group: group,
+//     category: dto.category,
+//   });
+
+//   await this.expenseRepo.save(expense);
+
+ 
+//   const members = group.group_member;
+//   const numMembers = members.length;
+//   const splitAmount = Math.floor(dto.amount / numMembers);
+//   const Total = dto.amount;
+//   const balance =Total-splitAmount
+
+//   const settlements = members.map((member) =>
+//     this.settlementRepo.create({
+//       expen: expense,
+//       user: member.user,
+//       expense: splitAmount, 
+//       paid: member.user.id === user.id ? Total : 0,
+//       pending: member.user.id === user.id ? balance : (0-splitAmount),
+//       paymentDate: new Date(),
+//     }),
+//   );
+
+//   await this.settlementRepo.save(settlements);
+
+//   return { message: 'Expense and settlements added', expense, settlements };
+// }
 async createExpense(dto: CreateExpenseDto, user: User) {
   const group = await this.groupRepo.findOne({
     where: { id: dto.groupId },
@@ -60,29 +101,37 @@ async createExpense(dto: CreateExpenseDto, user: User) {
 
   await this.expenseRepo.save(expense);
 
- 
   const members = group.group_member;
   const numMembers = members.length;
   const splitAmount = Math.floor(dto.amount / numMembers);
-  const Total = dto.amount;
-  const balance =Total-splitAmount
+  const total = dto.amount;
+  const balance = total - splitAmount;
 
   const settlements = members.map((member) =>
     this.settlementRepo.create({
       expen: expense,
       user: member.user,
-      expense: splitAmount, 
-      paid: member.user.id === user.id ? Total : 0,
-      pending: member.user.id === user.id ? balance : (0-splitAmount),
+      expense: splitAmount,
+      paid: member.user.id === user.id ? total : 0,
+      pending: member.user.id === user.id ? balance : 0 - splitAmount,
       paymentDate: new Date(),
     }),
   );
 
   await this.settlementRepo.save(settlements);
+  for (const member of members) {
+    const email = member.user.email;
+    if (email) {
+      await this.mailService.sendExpenseAddedEmail(email, {
+        description: expense.description,
+        amount: expense.amount
+      });
+      console.log(email);
+    }
+  }
 
   return { message: 'Expense and settlements added', expense, settlements };
 }
-
 
 
    async getSettlementsDetails(expensId:number){
@@ -92,6 +141,23 @@ async createExpense(dto: CreateExpenseDto, user: User) {
       })
     return  expend;
    }
+
+
+
+
+    async getExpensesGroupedByCategory() {
+    return await this.expenseRepo
+      .createQueryBuilder('expense')
+      .select('expense.category', 'category')
+      .addSelect('SUM(expense.amount)', 'totalAmount')
+      .groupBy('expense.category')
+      .getRawMany();
+  }
+
+ 
+ 
+
+
 
   findAll() {
     return `This action returns all expense`;

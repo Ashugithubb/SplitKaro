@@ -14,6 +14,8 @@ import { useAppDispatch } from '../redux/store/store';
 import { UserInfo } from '../redux/slice/user.slice';
 import { error } from 'console';
 import { useAppSelector } from '../redux/hook/hook';
+import { Button } from '@mui/material';
+import axios from 'axios';
 
 const Navbar: React.FC = () => {
   const router = useRouter();
@@ -27,6 +29,16 @@ const Navbar: React.FC = () => {
 }, [dispatch]);
 
 const {profile,loading,error} =  useAppSelector((state)=>state.profile);
+const handelLogoutClick = async ()=>{
+    try{
+      const res = await axios.post('http://localhost:3001/auth/logout');
+      console.log(res.data);
+      router.push('/login')
+    }
+    catch(err){
+      console.log(err)
+    }
+}
 
   return (
     <AppBar position="static" color="secondary" >
@@ -47,6 +59,8 @@ const {profile,loading,error} =  useAppSelector((state)=>state.profile);
         <Box flexGrow={1} />
 
         {/* Notification Bell + Avatar */}
+        <Button onClick = {handelLogoutClick} variant='contained'>Log out</Button>
+
         <Box display="flex" alignItems="center" gap={2}>
           <IconButton color="inherit">
             <NotificationsIcon />

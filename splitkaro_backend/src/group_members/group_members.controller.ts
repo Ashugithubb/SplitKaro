@@ -12,10 +12,15 @@ export class GroupMembersController {
     return this.groupMembersService.create(createGroupMemberDto);
   }
 
+
+
+
   @Get()
   findAll() {
     return this.groupMembersService.findAll();
   }
+
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -27,8 +32,11 @@ export class GroupMembersController {
     return this.groupMembersService.update(+id, updateGroupMemberDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.groupMembersService.remove(+id);
+   @Delete(':groupId/:memberId')
+  async removeMember(
+    @Param('groupId') groupId: number,
+    @Param('memberId') memberId: number,
+  ) {
+    return this.groupMembersService.removeMember(groupId, memberId);
   }
 }

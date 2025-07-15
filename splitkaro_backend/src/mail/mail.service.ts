@@ -1,29 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import Maildto from './dto/mail.dto';
+
 @Injectable()
 export class MailService {
-    constructor(private readonly mailerService: MailerService) { }
-
-   async sendMail(dto: Maildto): Promise<void> {
-    console.log(dto.email);
-  try {
-    await this.mailerService.sendMail({
-      to: dto.email,
-    //   from: process.env.MAIL_USER,
-      subject: 'Email Verification - OTP',
-      template: './otp', 
-      context: {
-    
-        name:"User",
-        otp: dto.otp,
-        year: new Date().getFullYear(),
-      },
-    });
-    console.log('OTP email sent successfully to', dto.email);
-  } catch (error) {
-    console.error('Failed to send OTP email:', error);
+  constructor(private readonly mailerService: MailerService) {}
+  async sendExpenseAddedEmail(email: string, expenseDetails: { description: string; amount: number }) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'New Expense Added',
+        template: './expense-added', 
+        context: {
+          description: expenseDetails.description,
+          amount: expenseDetails.amount,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send expense added email:', error);
+    }
   }
-}
+
+  async sendExpenseUpdatedEmail(email: string, expenseDetails: { description: string; amount: number }) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Expense Updated',
+        template: './expense-updated',
+        context: {
+          description: expenseDetails.description,
+          amount: expenseDetails.amount,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send expense update email:', error);
+    }
+  }
 
 }

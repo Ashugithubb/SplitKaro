@@ -8,6 +8,7 @@ import Navbar from '../component/navbar';
 import GroupDialog from '../component/GroupDialog';
 import axios from 'axios';
 import GroupList from '../component/GroupList';
+import Summary from '../component/expenseSummary';
 
 
 export default function HomePage() {
@@ -55,6 +56,7 @@ export default function HomePage() {
         onClose={() => setOpenDialog(false)}
         onCreate={handleCreateGroup}
       />
+      <Summary/>
     </>
   );
 }

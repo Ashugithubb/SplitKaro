@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Expense Updated</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        padding: 20px;
+      }
+      .container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 500px;
+        margin: auto;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .header {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff9800;
+        margin-bottom: 15px;
+      }
+      .content {
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 13px;
+        color: #888;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">✏️ Expense Updated</div>
+      <div class="content">
+        <p>Hello,</p>
+        <p>An expense has been updated in your group.</p>
+        <ul>
+          <li><strong>Description:</strong> {{description}}</li>
+          <li><strong>Updated Amount:</strong> ₹{{amount}}</li>
+        </ul>
+        <p>Check the app for the updated details.</p>
+      </div>
+    </div>
+  </body>
+</html>

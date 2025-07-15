@@ -84,7 +84,7 @@ async userGroupBlance(group_id: number, userId: number) {
     throw new NotFoundException('Group not found');
   }
 
-  // 1. Get all expense IDs in the group
+ 
   const expenseIds = group.expenses.map(exp => exp.id);
 
   if (expenseIds.length === 0) {
@@ -119,6 +119,27 @@ async userGroupBlance(group_id: number, userId: number) {
 }
 
 
+async getGroupMembers(groupId: number) {
+    const group = await this.groupRepo.findOne({
+      where: { id: groupId },
+    });
+
+    if (!group) {
+      throw new NotFoundException('Group not found');
+    }
+
+    const members = await this.groupMemberRepo.find({
+      where: { group: { id: groupId } },
+      relations: ['user'],
+    });
+
+    return members.map((m) => ({
+      id: m.user.id,
+      first_name: m.user.first_name,
+      last_name: m.user.last_name,
+      avatar: m.user.avatar,
+    }));
+  }
 
 
 

@@ -20,6 +20,7 @@ import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import { any } from 'zod';
+import MemberCard from '@/app/component/members';
 const groupMembers = [
   { id: 1, name: 'Ashutosh' },
   { id: 2, name: 'Rahul' },
@@ -42,6 +43,12 @@ type Balance = {
   totalPaid: number;
   totalPending: number;
   count: number;
+};
+type Member = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  avatar: string;
 };
 
 
@@ -187,7 +194,7 @@ const handelEventClick = (expensId:string)=>{
       const res = await axios.get(`http://localhost:3001/group/balance/${groupId}`, {
         withCredentials: true,
       });
-      setBalance(res.data); // ✅ full object (not just count)
+      setBalance(res.data); 
     } catch (err) {
       console.error('Error fetching balance:', err);
     }
@@ -198,11 +205,28 @@ const handelEventClick = (expensId:string)=>{
   }
 }, [groupId]);
 
+ const [members, setMembers] = useState<Member[]>([]);
+
+const fetchMembers = async () => {
+  try {
+    const res = await axios.get(`http://localhost:3001/group/members/${groupId}`, {
+      withCredentials: true,
+    });
+    setMembers(res.data);
+  } catch (err) {
+    console.error('Error fetching members:', err);
+  }
+};
+
+useEffect(() => {
+  if (groupId) fetchMembers();
+}, [groupId]);
 
 
 
   return (
     <>
+  
       <Navbar />
       <Box sx={{ p: 3 }}>
   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -215,7 +239,18 @@ const handelEventClick = (expensId:string)=>{
     >
       Add Member
     </Button>
-
+   <Box  sx={{display:"flex", gap:1}}>
+      {members.map((m) => (
+        <MemberCard
+  key={m.id}
+  id={m.id}
+  avatar={m.avatar}
+  name={`${m.first_name}`}
+  groupId={groupId}
+  onDelete={() => fetchMembers()} // re-fetch after deletion
+/>
+      ))}
+    </Box>
     {/* Balance Box - Center */}
     <Box
       sx={{
@@ -263,7 +298,9 @@ const handelEventClick = (expensId:string)=>{
 
   </Box>
 
- {searchOpen && (
+
+ {
+ searchOpen && (
   <Box sx={{ mt: 2 }}>
     <TextField
       variant="outlined"
@@ -277,21 +314,21 @@ const handelEventClick = (expensId:string)=>{
           </InputAdornment>
         ),
         style: {
-          color: '#fff',               // input text color
+          color: '#fff',               
         },
       }}
       sx={{
         maxWidth: 400,
-        bgcolor: '#1e1e1e',            // background color for input
-        input: { color: '#fff' },      // ensures text inside input stays white
+        bgcolor: '#1e1e1e',           
+        input: { color: '#fff' },      
         '& .MuiOutlinedInput-notchedOutline': {
-          borderColor: '#ccc',         // border color
+          borderColor: '#ccc',        
         },
         '&:hover .MuiOutlinedInput-notchedOutline': {
           borderColor: '#fff',
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-          borderColor: '#4fc3f7',      // focused border color
+          borderColor: '#4fc3f7',      
         },
       }}
       fullWidth

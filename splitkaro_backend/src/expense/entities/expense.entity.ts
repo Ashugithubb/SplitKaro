@@ -29,6 +29,6 @@ export class Expense {
   })
   category: Category;
 
-  @OneToMany(() => Settlement, (s) => s.expen)
+  @OneToMany(() => Settlement, (s) => s.expen,)
   settlement: Settlement[];
 }

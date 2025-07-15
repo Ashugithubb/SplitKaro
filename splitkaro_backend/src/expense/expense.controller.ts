@@ -46,4 +46,11 @@ export class ExpenseController {
   getSettlementsDetails(@Param('id') id: string){
     return this.expenseService.getSettlementsDetails(+id) ; 
   }
+
+   @Get('grouped/summary')
+  async getGroupedExpenseSummary() {
+    return await this.expenseService.getExpensesGroupedByCategory();
+  }
+
+ 
 }
