@@ -21,6 +21,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import { any } from 'zod';
 import MemberCard from '@/app/component/members';
+import { toast,ToastContainer } from 'react-toastify';
 const groupMembers = [
   { id: 1, name: 'Ashutosh' },
   { id: 2, name: 'Rahul' },
@@ -135,6 +136,7 @@ const handleAddUser = async (userId: number) => {
       }
     );
     console.log("User added:", res.data);
+    toast.success('memeber Added');
   } catch (err) {
     console.error("Failed to add user:", err);
   }
@@ -230,8 +232,8 @@ useEffect(() => {
       <Navbar />
       <Box sx={{ p: 3 }}>
   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-    
-    {/* Add Member Button - Left */}
+
+    <ToastContainer/>
     <Button
       onClick={handleAddMemberClick}
       variant="outlined"

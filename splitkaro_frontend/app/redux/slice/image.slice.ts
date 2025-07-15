@@ -11,12 +11,14 @@ const apiSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+     console.log("inside slice");
     builder
       .addCase(uploadImage.pending, (state) => {
         state.uploadStatus = 'loading';
       })
       .addCase(uploadImage.fulfilled, (state, action) => {
         state.uploadStatus = 'succeeded';
+       
         state.avatarUrl = action.payload;
       })
       .addCase(uploadImage.rejected, (state, action) => {

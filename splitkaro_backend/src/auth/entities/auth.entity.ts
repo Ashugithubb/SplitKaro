@@ -18,7 +18,7 @@ export class Auth {
     @CreateDateColumn()
     createdAt:Date
 
-    @OneToOne(()=>User)
+    @OneToOne(()=>User,{onDelete:"CASCADE"})
     @JoinColumn()
     user:User
 }

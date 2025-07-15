@@ -46,10 +46,10 @@ export default function Profile() {
 
       const data = res.data;
 
-      // Set avatar preview
+      
       setAvatarPreview(data.avatar);
 
-      // ✅ Set form values using react-hook-form reset()
+      
       reset({
         first_name: data.first_name,
         last_name: data.last_name,
@@ -74,6 +74,7 @@ export default function Profile() {
             setAvatarPreview(URL.createObjectURL(file));
             try {
                 const res = await dispatch(uploadImage(file));
+                console.log(`after calling upl0d image${avtarUrl}`);
                 toast("Image Uploaded!");
 
             } catch (err) {
@@ -84,7 +85,7 @@ export default function Profile() {
     }
 
     const onSubmit = async (formData: ProfileData) => {
-        console.log("resp0nse ayaya");
+        console.log(avtarUrl);
         const payload = {
             first_name: formData.first_name,
             last_name: formData.last_name,
