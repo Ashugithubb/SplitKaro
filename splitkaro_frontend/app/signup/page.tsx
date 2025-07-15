@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useRouter } from 'next/navigation'
 import axios from 'axios';
+import { toast,ToastContainer } from 'react-toastify';
 
 const signupSchema = z
   .object({
@@ -50,14 +51,22 @@ const router = useRouter();
     try{
     const res = await axios.post('http://localhost:3001/auth/signup',data);
     console.log(res);
+    toast.success("Registration successful!");
     router.push('/login');
   }
-    catch(error){
-        console.log(error);
+    catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      const { message } = error.response.data;
+      toast.error(message); 
+    } else {
+      toast.error("Something went wrong");
     }
+  }
   };
 
   return (
+    <>
+    <ToastContainer />
     <Box
       display="flex"
       justifyContent="center"
@@ -69,6 +78,7 @@ const router = useRouter();
         <Typography variant="h5" gutterBottom>
           Sign Up
         </Typography>
+
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
          
@@ -128,5 +138,6 @@ const router = useRouter();
         </form>
       </Paper>
     </Box>
+    </>
   );
 }
