@@ -104,7 +104,7 @@ async updateSettlement(settlementId: number, dto: UpdateSettlementDto) {
 
   await this.settlementRepo.save(updatedSettlements);
 
-  // ✅ Send notification emails to users
+  
   const exp = target.expen;
   for (const s of updatedSettlements) {
     const email = s.user.email;

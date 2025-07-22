@@ -28,6 +28,8 @@ export class Expense {
     default: Category.OTHER,  
   })
   category: Category;
+  // @Column()
+  // createdBy:number
 
   @OneToMany(() => Settlement, (s) => s.expen,)
   settlement: Settlement[];

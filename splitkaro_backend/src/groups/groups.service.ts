@@ -60,10 +60,6 @@ async findAllExpense(groupId: number) {
   return group?.expenses || [];
 }
 
-
-
-
-
   update(id: number, updateGroupDto: UpdateGroupDto) {
     return `This action updates a #${id} group`;
   }

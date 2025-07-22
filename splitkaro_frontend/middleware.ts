@@ -23,6 +23,13 @@ export const config = {
 };
 
 
+
+
+
+
+
+
+
 // Allow public routes
   // const publicPaths = ['/home', '/login', '/register'];
   // if (publicPaths.includes(pathname)) {
