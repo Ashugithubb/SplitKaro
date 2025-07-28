@@ -12,7 +12,7 @@
 | Backend     | NestJS, Express, TypeORM, PostgreSQL   |
 | Auth        | JWT                |
 | File Upload | Cloudinary         |
-| Notifications | Email service (Nodemailer) or Push    |
+| Notifications | Email service (nestmailer)  |
 
 
 
